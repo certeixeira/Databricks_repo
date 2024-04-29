@@ -371,17 +371,22 @@ fig.show()
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   FLOOR(ss.IDADE / 5) * 5 AS faixa_etaria,
-# MAGIC   ROUND(SUM(ss.VAL_TOT)) AS total_valor,
-# MAGIC   ROUND(AVG(ss.VAL_TOT)) AS media_valor
-# MAGIC FROM
-# MAGIC   bronze.datasus.sihsus ss
-# MAGIC GROUP BY
-# MAGIC   FLOOR(ss.IDADE / 5) * 5
-# MAGIC ORDER BY
-# MAGIC   faixa_etaria;
+df = spark.sql("""
+SELECT
+  FLOOR(ss.IDADE / 5) * 5 AS faixa_etaria,
+  ROUND(SUM(ss.VAL_TOT)) AS total,
+  ROUND(AVG(ss.VAL_TOT)) AS media
+FROM
+  bronze.datasus.sihsus ss
+GROUP BY
+  FLOOR(ss.IDADE / 5) * 5
+ORDER BY
+  faixa_etaria;
+""").toPandas()
+
+fig = px.line(df, y='total', x='faixa_etaria')
+
+fig.show()
 
 # COMMAND ----------
 
